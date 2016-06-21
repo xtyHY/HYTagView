@@ -66,11 +66,11 @@
     _tagView = [[HYTagView alloc] initWithFrame:(CGRect){0,50,[UIScreen mainScreen].bounds.size.width, 0}
                                       tagsArray:marray
                                        tagStyle:HYTagStyleBorder
-                                      clickable:NO];
+                                      clickable:YES];
     _tagView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:_tagView];
     
-    [_tagView selectAllTag];
+//    [_tagView selectAllTag];
 }
 
 - (void)didReceiveMemoryWarning {

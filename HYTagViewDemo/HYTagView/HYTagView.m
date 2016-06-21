@@ -202,50 +202,56 @@ static NSInteger const kTagBtnFontSize = 14;
     tagBtn.layer.borderColor = tagBtn.selected ? _tagBorderColorSelected.CGColor : _tagBorderColorNormal.CGColor;
 }
 
-#pragma mark - 对外开放的方法
+#pragma mark - 对外方法
+#pragma mark 获取所有选中的Tags
 - (NSArray *)getSelectedTags{
     
-    NSMutableArray *resultArray = [[NSMutableArray alloc] init];
-    
-    for (HYTagModel * model in _tagsArray) {
-        
-        if (model.isSelected)
-            [resultArray addObject:model];
-    }
-    
-    return resultArray;
+    return [self getTagsIsSelected:YES];
 }
 
+#pragma mark 获取所有未选中的Tags
 - (NSArray *)getUnselectedTags{
     
+    return [self getTagsIsSelected:NO];
+}
+
+#pragma mark 选中所有的Tag
+- (void)selectAllTag{
+    
+    [self changeAllTagStatusToSelected:YES];
+}
+
+#pragma mark 反选所有Tag
+- (void)unselectAllTag{
+    
+    [self changeAllTagStatusToSelected:NO];
+}
+
+#pragma mark - 私有方法
+#pragma mark 获取选中/非选中Tags
+- (NSArray *)getTagsIsSelected:(BOOL)isSelected{
+    
     NSMutableArray *resultArray = [[NSMutableArray alloc] init];
     
     for (HYTagModel * model in _tagsArray) {
         
-        if (!model.isSelected)
+        if (model.isSelected==isSelected)
             [resultArray addObject:model];
     }
     
     return resultArray;
 }
 
-- (void)selectAllTag{
+#pragma mark 选中/反选所有Tag
+- (void)changeAllTagStatusToSelected:(BOOL)toSelected{
     
     for (NSInteger i=0; i<_tagsArray.count; i++) {
         
         UIButton *tagBtn = [self viewWithTag:kTagBtnBaseTag+i];
-        tagBtn.selected = NO;
-        [self clickTag:tagBtn];
-    }
-}
-
-- (void)unselectAllTag{
-    
-    for (NSInteger i=0; i<_tagsArray.count; i++) {
-        
-        UIButton *tagBtn = [self viewWithTag:kTagBtnBaseTag+i];
-        tagBtn.selected = YES;
-        [self clickTag:tagBtn];
+        HYTagModel *tagModel = _tagsArray[tagBtn.tag-kTagBtnBaseTag];
+        tagModel.isSelected = toSelected;
+        tagBtn.selected = toSelected;
+        [self customAppearanceTagBtn:tagBtn];
     }
 }
 
