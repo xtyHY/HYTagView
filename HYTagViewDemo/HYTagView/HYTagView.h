@@ -36,22 +36,65 @@ typedef NS_ENUM(NSUInteger, HYTagStyle) {
  */
 @interface HYTagView : UIView
 
-//用tagsArray初始化TagView
+/**
+ *  @author HY, 16-06-21
+ *
+ *  @brief 简单的初始化一个TagView（样式为默认/可点击）
+ *
+ *  @param frame     TagView尺寸
+ *  @param tagsArray 需要显示的TagModel数据
+ *
+ *  @return TagView对象
+ */
+- (instancetype)initWithFrame:(CGRect)frame tagsArray:(NSArray *)tagsArray;
+
+/**
+ *  @author HY, 16-06-21
+ *
+ *  @brief 初始化一个TagView
+ *
+ *  @param frame       TagView尺寸
+ *  @param tagsArray   需要显示的TagModel数组
+ *  @param tagStyle    tag的样式（HYTagStyle枚举）
+ *  @param clickable   能否点击
+ *
+ *  @return TagView对象
+ */
 - (instancetype)initWithFrame:(CGRect)frame
                     tagsArray:(NSArray *)tagsArray
                      tagStyle:(HYTagStyle)tagStyle
-                  noClickable:(BOOL)noClickable;
+                    clickable:(BOOL)clickable;
 
-//获取所有选中的Tags
+/**
+ *  @author HY, 16-06-21
+ *
+ *  @brief 获取所有选中的TagModel
+ *
+ *  @return 所有选中的TagModel的数组
+ */
 - (NSArray *)getSelectedTags;
 
-//获取所有未选中的Tags
+/**
+ *  @author HY, 16-06-21
+ *
+ *  @brief 获取所有未选中的TagModel
+ *
+ *  @return 所有未选中的TagModel的数组
+ */
 - (NSArray *)getUnselectedTags;
 
-//选中所有Tag
+/**
+ *  @author HY, 16-06-21
+ *
+ *  @brief 主动选中所有Tag
+ */
 - (void)selectAllTag;
 
-//取消选中所有Tag
+/**
+ *  @author HY, 16-06-21
+ *
+ *  @brief 主动取消选中所有Tag
+ */
 - (void)unselectAllTag;
 
 

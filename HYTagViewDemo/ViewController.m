@@ -58,13 +58,18 @@
         
         [marray addObject:[[HYTagModel alloc] initWithDict:dict]];
     }
+    //---初始化方法1,默认style和默认可点击
+//    _tagView = [[HYTagView alloc] initWithFrame:(CGRect){0,50,[UIScreen mainScreen].bounds.size.width, 0}
+//                                      tagsArray:marray];
     
+    //---初始化方法2,可配置style和是否可点击
     _tagView = [[HYTagView alloc] initWithFrame:(CGRect){0,50,[UIScreen mainScreen].bounds.size.width, 0}
                                       tagsArray:marray
-                                       tagStyle:HYTagStyleNormal
-                                    noClickable:NO];
+                                       tagStyle:HYTagStyleBorder
+                                      clickable:NO];
     _tagView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:_tagView];
+    
     [_tagView selectAllTag];
 }
 

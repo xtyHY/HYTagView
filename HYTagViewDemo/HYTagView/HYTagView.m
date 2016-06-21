@@ -42,7 +42,7 @@ static NSInteger const kTagBtnFontSize = 14;
     
     NSArray     *_tagsArray;
     HYTagStyle   _tagStyle;
-    BOOL         _noClickable;
+    BOOL         _clickable;
     
     UIColor     *_tagTextColorNormal;
     UIColor     *_tagTextColorSelected;
@@ -55,24 +55,51 @@ static NSInteger const kTagBtnFontSize = 14;
 
 @implementation HYTagView
 
+#pragma mark - 初始化及配置
+- (instancetype)initWithFrame:(CGRect)frame tagsArray:(NSArray *)tagsArray{
+    
+    self = [super initWithFrame:frame];
+    if (self) {
+        
+        _tagsArray = [[NSArray alloc] initWithArray:tagsArray];
+        _tagStyle  = HYTagStyleNormal;
+        _clickable = YES;
+        
+        [self initUI];
+        [self configStyle];
+    }
+    return self;
+}
+
 - (instancetype)initWithFrame:(CGRect)frame
                     tagsArray:(NSArray *)tagsArray
                      tagStyle:(HYTagStyle)tagStyle
-                  noClickable:(BOOL)noClickable{
+                    clickable:(BOOL)clickable{
     
     self = [super initWithFrame:frame];
     if (self) {
         
         _tagsArray = [[NSArray alloc] initWithArray:tagsArray];
         _tagStyle = tagStyle;
-        _noClickable = noClickable;
+        _clickable = clickable;
         
         [self initUI];
+        [self configStyle];
     }
     return self;
 }
 
 - (void)initUI{
+    
+    for (NSInteger i=0 ; i<_tagsArray.count ;i++) {
+        
+        UIButton *tagBtn = [[UIButton alloc] init];
+        tagBtn.tag = kTagBtnBaseTag + i;
+        [self addSubview:tagBtn];
+    }
+}
+
+- (void)configStyle{
     //NormalStyle Normal    文字0x373737、背景0xF3F4F5、边框无
     //            Selected  文字0xFFFFFF、背景0xFF9933、边框无
     //BorderStyle Normal    文字0x373737、背景无、边框0x373737
@@ -95,15 +122,9 @@ static NSInteger const kTagBtnFontSize = 14;
         _tagBorderColorNormal   = HexColor(0x373737,1);
         _tagBorderColorSelected = HexColor(0xFF8903,1);
     }
-    
-    for (NSInteger i=0 ; i<_tagsArray.count ;i++) {
-        
-        UIButton *tagBtn = [[UIButton alloc] init];
-        tagBtn.tag = kTagBtnBaseTag + i;
-        [self addSubview:tagBtn];
-    }
 }
 
+#pragma mark - layoutSubviews
 - (void)layoutSubviews{
     
     CGFloat marginW = 10;
@@ -143,16 +164,9 @@ static NSInteger const kTagBtnFontSize = 14;
         tagBtn.frame = (CGRect){tagBtnX, tagBtnY, tagBtnW, tagBtnH};
         //---btn布局结束
         
-        //对于不可点击的tagView（仅展示）
-        if (_noClickable) {
-            
-            tagBtn.userInteractionEnabled = NO;
-            [tagBtn addTarget:self action:@selector(clickTag:) forControlEvents:UIControlEventTouchUpInside];
-        }else{
-            
-            tagBtn.userInteractionEnabled = YES;
-            [tagBtn addTarget:self action:@selector(clickTag:) forControlEvents:UIControlEventTouchUpInside];
-        }
+        //---控制事件
+        tagBtn.userInteractionEnabled = _clickable ? YES : NO;
+        [tagBtn addTarget:self action:@selector(clickTag:) forControlEvents:UIControlEventTouchUpInside];
         
         //---设置外观
         tagBtn.titleLabel.font = [UIFont systemFontOfSize:kTagBtnFontSize];
@@ -170,12 +184,7 @@ static NSInteger const kTagBtnFontSize = 14;
     
 }
 
-- (void)customAppearanceTagBtn:(UIButton *)tagBtn{
-    
-    tagBtn.backgroundColor = tagBtn.selected ? _tagBGColorSelected : _tagBGColorNormal;
-    tagBtn.layer.borderColor = tagBtn.selected ? _tagBorderColorSelected.CGColor : _tagBorderColorNormal.CGColor;
-}
-
+#pragma mark - 点击事件
 - (void)clickTag:(UIButton *)tagBtn{
     
     tagBtn.selected = tagBtn.selected ? NO : YES;
@@ -186,6 +195,14 @@ static NSInteger const kTagBtnFontSize = 14;
     //    NSLog(@"==%@",tagModel);
 }
 
+#pragma mark - 根据是否选中改变外观
+- (void)customAppearanceTagBtn:(UIButton *)tagBtn{
+    
+    tagBtn.backgroundColor = tagBtn.selected ? _tagBGColorSelected : _tagBGColorNormal;
+    tagBtn.layer.borderColor = tagBtn.selected ? _tagBorderColorSelected.CGColor : _tagBorderColorNormal.CGColor;
+}
+
+#pragma mark - 对外开放的方法
 - (NSArray *)getSelectedTags{
     
     NSMutableArray *resultArray = [[NSMutableArray alloc] init];
