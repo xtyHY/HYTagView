@@ -42,7 +42,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
     NSArray *array = @[
                        @{@"tagId":@100, @"tagName":@"test1", @"isSelected":@YES},
                        @{@"tagId":@102, @"tagName":@"te2323", @"isSelected":@YES},
@@ -62,10 +61,11 @@
     
     _tagView = [[HYTagView alloc] initWithFrame:(CGRect){0,50,[UIScreen mainScreen].bounds.size.width, 0}
                                       tagsArray:marray
-                                       tagStyle:HYTagStyleBorder
-                                    noClickable:YES];
-    _tagView.backgroundColor = [UIColor cyanColor];
+                                       tagStyle:HYTagStyleNormal
+                                    noClickable:NO];
+    _tagView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:_tagView];
+    [_tagView selectAllTag];
 }
 
 - (void)didReceiveMemoryWarning {

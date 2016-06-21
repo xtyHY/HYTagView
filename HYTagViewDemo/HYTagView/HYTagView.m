@@ -8,7 +8,12 @@
 
 #import "HYTagView.h"
 
-#define kTagBtnBaseTag 1000
+#define HexColor(hexValue,a) [UIColor colorWithRed:((float)((hexValue & 0xFF0000) >> 16))/255.0 green:((float)((hexValue & 0xFF00) >> 8))/255.0 blue:((float)(hexValue & 0xFF))/255.0 alpha:a ]
+
+static NSInteger const kTagBtnBaseTag  = 1000;
+static NSInteger const kTagBtnFontSize = 14;
+
+//static NSInteger const kTagBtn
 
 //============= HYTagModel =============
 @implementation HYTagModel
@@ -38,6 +43,13 @@
     NSArray     *_tagsArray;
     HYTagStyle   _tagStyle;
     BOOL         _noClickable;
+    
+    UIColor     *_tagTextColorNormal;
+    UIColor     *_tagTextColorSelected;
+    UIColor     *_tagBGColorNormal;
+    UIColor     *_tagBGColorSelected;
+    UIColor     *_tagBorderColorNormal;
+    UIColor     *_tagBorderColorSelected;
 }
 @end
 
@@ -54,88 +66,121 @@
         _tagsArray = [[NSArray alloc] initWithArray:tagsArray];
         _tagStyle = tagStyle;
         _noClickable = noClickable;
+        
+        [self initUI];
     }
     return self;
 }
 
+- (void)initUI{
+    //NormalStyle Normal    文字0x373737、背景0xF3F4F5、边框无
+    //            Selected  文字0xFFFFFF、背景0xFF9933、边框无
+    //BorderStyle Normal    文字0x373737、背景无、边框0x373737
+    //            Selected  文字0xFF8903、背景无、边框0xFF8903
+    
+    if (_tagStyle==HYTagStyleNormal) {
+        
+        _tagTextColorNormal   = HexColor(0x373737,1);
+        _tagTextColorSelected = HexColor(0xFFFFFF,1);
+        _tagBGColorNormal     = HexColor(0xF3F4F5,1);
+        _tagBGColorSelected   = HexColor(0xFF9933,1);
+        _tagBorderColorNormal   = HexColor(0xFFFFFF,0);
+        _tagBorderColorSelected = HexColor(0xFFFFFF,0);
+    }else{
+        
+        _tagTextColorNormal   = HexColor(0x373737,1);
+        _tagTextColorSelected = HexColor(0xFF8903,1);
+        _tagBGColorNormal     = HexColor(0xFFFFFF,0);
+        _tagBGColorSelected   = HexColor(0xFFFFFF,0);
+        _tagBorderColorNormal   = HexColor(0x373737,1);
+        _tagBorderColorSelected = HexColor(0xFF8903,1);
+    }
+    
+    for (NSInteger i=0 ; i<_tagsArray.count ;i++) {
+        
+        UIButton *tagBtn = [[UIButton alloc] init];
+        tagBtn.tag = kTagBtnBaseTag + i;
+        [self addSubview:tagBtn];
+    }
+}
+
 - (void)layoutSubviews{
     
-    CGFloat margin = 8;
+    CGFloat marginW = 10;
+    CGFloat marginH = 10;
     CGFloat lineH = 30;
-    CGFloat horizontal = 0;
-    CGFloat vertical = margin;
+    CGFloat horizontal = 0;     //水平宽度
+    CGFloat vertical = marginH; //垂直高度
     CGFloat lineNum = 0;
     
     for (NSInteger i=0 ; i<_tagsArray.count ;i++) {
         
         HYTagModel *tagModel = _tagsArray[i];
         
-        UIButton *tagBtn = [[UIButton alloc] init];
-        
+        UIButton *tagBtn = [self viewWithTag:kTagBtnBaseTag+i];
         [tagBtn setTitle:tagModel.tagName forState:UIControlStateNormal];
         tagBtn.selected = tagModel.isSelected;
-        tagBtn.tag = kTagBtnBaseTag + i;
         
-        CGFloat tagBtnW = [tagModel.tagName sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16]}].width+lineH;
-        CGFloat tagBtnH = lineH;
+        //---开始计算给btn布局
+        CGFloat tagBtnX, tagBtnY, tagBtnW, tagBtnH;
         
-        horizontal += margin;
+        tagBtnH = lineH;
+        tagBtnW = [tagModel.tagName sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:kTagBtnFontSize]}].width+lineH;
         
+        horizontal += marginW;
         
-        CGFloat tagBtnX;
-        CGFloat tagBtnY;
-        
-        if (horizontal + tagBtnW + margin > self.frame.size.width) {
-            
+        if (horizontal + tagBtnW + marginW > self.frame.size.width) {
+            //一行房不下了，需要从第二行开始放
             lineNum += 1;
-            horizontal = margin;
-            vertical += margin + lineH;
+            horizontal = marginW;
+            vertical += marginH + lineH;
         }
         
         tagBtnX = horizontal;
         tagBtnY = vertical;
         
-        tagBtn.frame = (CGRect){tagBtnX, tagBtnY, tagBtnW, tagBtnH};
-        [self addSubview:tagBtn];
-        
         horizontal = tagBtnX + tagBtnW;
+        tagBtn.frame = (CGRect){tagBtnX, tagBtnY, tagBtnW, tagBtnH};
+        //---btn布局结束
         
+        //对于不可点击的tagView（仅展示）
+        if (_noClickable) {
+            
+            tagBtn.userInteractionEnabled = NO;
+            [tagBtn addTarget:self action:@selector(clickTag:) forControlEvents:UIControlEventTouchUpInside];
+        }else{
+            
+            tagBtn.userInteractionEnabled = YES;
+            [tagBtn addTarget:self action:@selector(clickTag:) forControlEvents:UIControlEventTouchUpInside];
+        }
+        
+        //---设置外观
+        tagBtn.titleLabel.font = [UIFont systemFontOfSize:kTagBtnFontSize];
+        tagBtn.layer.cornerRadius = tagBtn.frame.size.height/2.0f;
+        tagBtn.layer.borderWidth = 1.0f;
+        [tagBtn setTitleColor:_tagTextColorNormal forState:UIControlStateNormal];
+        [tagBtn setTitleColor:_tagTextColorSelected forState:UIControlStateSelected];
+        
+        //---设置各种style下的外观
         [self customAppearanceTagBtn:tagBtn];
     }
     
-    self.frame = (CGRect){self.frame.origin.x, self.frame.origin.y, self.frame.size.width ,vertical+lineH+margin};
-    
+    //---tagView重新适应
+    self.frame = (CGRect){self.frame.origin.x, self.frame.origin.y, self.frame.size.width ,vertical+lineH+marginW};
     
 }
 
 - (void)customAppearanceTagBtn:(UIButton *)tagBtn{
     
-    tagBtn.titleLabel.font = [UIFont systemFontOfSize:16];
-    tagBtn.layer.cornerRadius = tagBtn.frame.size.height/2.0f;
-    
-    if (_tagStyle==HYTagStyleNormal) {
-        
-        [tagBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [tagBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
-        tagBtn.backgroundColor = tagBtn.selected ? [UIColor orangeColor] : [UIColor lightGrayColor];
-        
-    }else if(_tagStyle==HYTagStyleBorder){
-        
-        tagBtn.layer.borderWidth = 1.0f;
-        tagBtn.layer.borderColor = tagBtn.selected ? [UIColor orangeColor].CGColor : [UIColor blackColor].CGColor;
-        [tagBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [tagBtn setTitleColor:[UIColor orangeColor] forState:UIControlStateSelected];
-    }
+    tagBtn.backgroundColor = tagBtn.selected ? _tagBGColorSelected : _tagBGColorNormal;
+    tagBtn.layer.borderColor = tagBtn.selected ? _tagBorderColorSelected.CGColor : _tagBorderColorNormal.CGColor;
 }
 
 - (void)clickTag:(UIButton *)tagBtn{
     
-    if (!_noClickable) {
-        
-        tagBtn.selected = tagBtn.selected ? NO : YES;
-        HYTagModel *tagModel = _tagsArray[tagBtn.tag-kTagBtnBaseTag];
-        tagModel.isSelected = tagBtn.selected;
-    }
+    tagBtn.selected = tagBtn.selected ? NO : YES;
+    HYTagModel *tagModel = _tagsArray[tagBtn.tag-kTagBtnBaseTag];
+    tagModel.isSelected = tagBtn.selected;
     
     [self customAppearanceTagBtn:tagBtn];
     //    NSLog(@"==%@",tagModel);
@@ -169,9 +214,6 @@
 
 - (void)selectAllTag{
     
-    if (_noClickable)
-        return;
-    
     for (NSInteger i=0; i<_tagsArray.count; i++) {
         
         UIButton *tagBtn = [self viewWithTag:kTagBtnBaseTag+i];
@@ -181,9 +223,6 @@
 }
 
 - (void)unselectAllTag{
-    
-    if (_noClickable)
-        return;
     
     for (NSInteger i=0; i<_tagsArray.count; i++) {
         
