@@ -12,8 +12,9 @@
 
 static NSInteger const kTagBtnBaseTag  = 1000;
 static NSInteger const kTagBtnFontSize = 14;
-
-//static NSInteger const kTagBtn
+static CGFloat const kBtnMarginW = 10;
+static CGFloat const kBtnMarginH = 10;
+static CGFloat const klineHeight = 30;
 
 //============= HYTagModel =============
 @implementation HYTagModel
@@ -127,12 +128,12 @@ static NSInteger const kTagBtnFontSize = 14;
 #pragma mark - layoutSubviews
 - (void)layoutSubviews{
     
-    CGFloat marginW = 10;
-    CGFloat marginH = 10;
-    CGFloat lineH = 30;
+    CGFloat marginW = kBtnMarginW;
+    CGFloat marginH = kBtnMarginH;
+    CGFloat lineH   = klineHeight;
     CGFloat horizontal = 0;     //水平宽度
-    CGFloat vertical = marginH; //垂直高度
-    CGFloat lineNum = 0;
+    CGFloat vertical   = marginH; //垂直高度
+    CGFloat lineNum    = 0;
     
     for (NSInteger i=0 ; i<_tagsArray.count ;i++) {
         
