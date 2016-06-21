@@ -35,18 +35,25 @@
 //============= HYTagView =============
 @interface HYTagView(){
     
-    NSArray *_tagsArray;
+    NSArray     *_tagsArray;
+    HYTagStyle   _tagStyle;
+    BOOL         _noClickable;
 }
 @end
 
 @implementation HYTagView
 
-- (instancetype)initWithFrame:(CGRect)frame tagsArray:(NSArray *)tagsArray{
+- (instancetype)initWithFrame:(CGRect)frame
+                    tagsArray:(NSArray *)tagsArray
+                     tagStyle:(HYTagStyle)tagStyle
+                  noClickable:(BOOL)noClickable{
     
     self = [super initWithFrame:frame];
     if (self) {
         
         _tagsArray = [[NSArray alloc] initWithArray:tagsArray];
+        _tagStyle = tagStyle;
+        _noClickable = noClickable;
     }
     return self;
 }
@@ -68,22 +75,6 @@
         [tagBtn setTitle:tagModel.tagName forState:UIControlStateNormal];
         tagBtn.selected = tagModel.isSelected;
         tagBtn.tag = kTagBtnBaseTag + i;
-        
-        tagBtn.titleLabel.font = [UIFont systemFontOfSize:16];
-        
-        if (tagBtn.selected) {
-            
-            [tagBtn setBackgroundColor:[UIColor orangeColor]];
-        }else{
-            
-            [tagBtn setBackgroundColor:[UIColor lightGrayColor]];
-        }
-        
-        [tagBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [tagBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
-        [tagBtn addTarget:self action:@selector(clickTag:) forControlEvents:UIControlEventTouchUpInside];
-        
-        tagBtn.layer.cornerRadius = lineH/2.0f;
         
         CGFloat tagBtnW = [tagModel.tagName sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16]}].width+lineH;
         CGFloat tagBtnH = lineH;
@@ -108,26 +99,46 @@
         [self addSubview:tagBtn];
         
         horizontal = tagBtnX + tagBtnW;
+        
+        [self customAppearanceTagBtn:tagBtn];
     }
     
     self.frame = (CGRect){self.frame.origin.x, self.frame.origin.y, self.frame.size.width ,vertical+lineH+margin};
+    
+    
+}
+
+- (void)customAppearanceTagBtn:(UIButton *)tagBtn{
+    
+    tagBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    tagBtn.layer.cornerRadius = tagBtn.frame.size.height/2.0f;
+    
+    if (_tagStyle==HYTagStyleNormal) {
+        
+        [tagBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [tagBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+        tagBtn.backgroundColor = tagBtn.selected ? [UIColor orangeColor] : [UIColor lightGrayColor];
+        
+    }else if(_tagStyle==HYTagStyleBorder){
+        
+        tagBtn.layer.borderWidth = 1.0f;
+        tagBtn.layer.borderColor = tagBtn.selected ? [UIColor orangeColor].CGColor : [UIColor blackColor].CGColor;
+        [tagBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [tagBtn setTitleColor:[UIColor orangeColor] forState:UIControlStateSelected];
+    }
 }
 
 - (void)clickTag:(UIButton *)tagBtn{
     
-    tagBtn.selected = tagBtn.selected ? NO : YES;
-    HYTagModel *tagModel = _tagsArray[tagBtn.tag-kTagBtnBaseTag];
-    tagModel.isSelected = tagBtn.selected;
-    
-    if (tagBtn.selected) {
+    if (!_noClickable) {
         
-        [tagBtn setBackgroundColor:[UIColor orangeColor]];
-    }else{
-        
-        [tagBtn setBackgroundColor:[UIColor lightGrayColor]];
+        tagBtn.selected = tagBtn.selected ? NO : YES;
+        HYTagModel *tagModel = _tagsArray[tagBtn.tag-kTagBtnBaseTag];
+        tagModel.isSelected = tagBtn.selected;
     }
     
-//    NSLog(@"==%@",tagModel);
+    [self customAppearanceTagBtn:tagBtn];
+    //    NSLog(@"==%@",tagModel);
 }
 
 - (NSArray *)getSelectedTags{
@@ -158,10 +169,10 @@
 
 - (void)selectAllTag{
     
+    if (_noClickable)
+        return;
+    
     for (NSInteger i=0; i<_tagsArray.count; i++) {
-        
-        HYTagModel *tagModel = _tagsArray[i];
-        tagModel.isSelected = YES;
         
         UIButton *tagBtn = [self viewWithTag:kTagBtnBaseTag+i];
         tagBtn.selected = NO;
@@ -171,10 +182,10 @@
 
 - (void)unselectAllTag{
     
+    if (_noClickable)
+        return;
+    
     for (NSInteger i=0; i<_tagsArray.count; i++) {
-        
-        HYTagModel *tagModel = _tagsArray[i];
-        tagModel.isSelected = NO;
         
         UIButton *tagBtn = [self viewWithTag:kTagBtnBaseTag+i];
         tagBtn.selected = YES;

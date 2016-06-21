@@ -42,14 +42,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    
     NSArray *array = @[
-                        @{@"tagId":@100, @"tagName":@"test1", @"isSelected":@NO},
-                        @{@"tagId":@102, @"tagName":@"te2323", @"isSelected":@NO},
-                        @{@"tagId":@103, @"tagName":@"t123123123123", @"isSelected":@NO},
-                        @{@"tagId":@105, @"tagName":@"tesdfdsfds", @"isSelected":@NO},
-                        @{@"tagId":@106, @"tagName":@"test1", @"isSelected":@YES},
-                        @{@"tagId":@107, @"tagName":@"test213", @"isSelected":@NO},
-                        @{@"tagId":@101, @"tagName":@"test12312314", @"isSelected":@NO}
+                       @{@"tagId":@100, @"tagName":@"test1", @"isSelected":@YES},
+                       @{@"tagId":@102, @"tagName":@"te2323", @"isSelected":@YES},
+                       @{@"tagId":@103, @"tagName":@"t123123123123", @"isSelected":@YES},
+                       @{@"tagId":@105, @"tagName":@"tesdfdsfds", @"isSelected":@YES},
+                       @{@"tagId":@106, @"tagName":@"test1", @"isSelected":@YES},
+                       @{@"tagId":@107, @"tagName":@"test213", @"isSelected":@NO},
+                       @{@"tagId":@101, @"tagName":@"test12312314", @"isSelected":@NO}
                        ];
     
     NSMutableArray *marray = [[NSMutableArray alloc] init];
@@ -59,7 +60,10 @@
         [marray addObject:[[HYTagModel alloc] initWithDict:dict]];
     }
     
-    _tagView = [[HYTagView alloc] initWithFrame:(CGRect){0,50,[UIScreen mainScreen].bounds.size.width, 0} tagsArray:marray];
+    _tagView = [[HYTagView alloc] initWithFrame:(CGRect){0,50,[UIScreen mainScreen].bounds.size.width, 0}
+                                      tagsArray:marray
+                                       tagStyle:HYTagStyleBorder
+                                    noClickable:YES];
     _tagView.backgroundColor = [UIColor cyanColor];
     [self.view addSubview:_tagView];
 }

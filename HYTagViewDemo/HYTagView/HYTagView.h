@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+
+typedef NS_ENUM(NSUInteger, HYTagStyle) {
+    HYTagStyleNormal    =   0,
+    HYTagStyleBorder
+};
+
 /**
  *  @author HY, 16-06-20
  *
@@ -31,7 +37,10 @@
 @interface HYTagView : UIView
 
 //用tagsArray初始化TagView
-- (instancetype)initWithFrame:(CGRect)frame tagsArray:(NSArray *)tagsArray;
+- (instancetype)initWithFrame:(CGRect)frame
+                    tagsArray:(NSArray *)tagsArray
+                     tagStyle:(HYTagStyle)tagStyle
+                  noClickable:(BOOL)noClickable;
 
 //获取所有选中的Tags
 - (NSArray *)getSelectedTags;
