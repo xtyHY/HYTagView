@@ -25,7 +25,7 @@
 
 - (IBAction)deSelectAll:(id)sender {
     
-    [_tagView unselectAllTag];
+    [_tagView deselectAllTag];
 }
 
 - (IBAction)getAllSelected:(id)sender {
