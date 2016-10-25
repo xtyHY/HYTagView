@@ -89,7 +89,8 @@
 				04325E301D17E20B0018142C /* HYTagView.h */,
 				04325E311D17E20B0018142C /* HYTagView.m */,
 			);
-			path = HYTagView;
+			name = HYTagView;
+			path = ../HYTagView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
